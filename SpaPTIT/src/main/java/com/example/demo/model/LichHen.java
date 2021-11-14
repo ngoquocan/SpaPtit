@@ -22,7 +22,7 @@ public class LichHen {
 	private KhachHang khachhang;
 	@ManyToOne
 	@JoinColumn
-	private DichVu dichVu;
+	private DichVu dichvu;
 	@ManyToOne
 	@JoinColumn
 	private SlotKhungGio thoigian;

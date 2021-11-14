@@ -13,10 +13,10 @@
    <body>
       <h3>Welcome,</h3>
       <a href="logout">Đăng xuất</a>
-      <form action="#">
+      <form action="timkhachhang" method="get">
       	<h4>Nhập thông tin: </h4>
       	<input type="text" name = "data">
-      	<input type= "submit" name="Tìm kiếm">
+      	<input type= "submit" value="Tìm kiếm">
       </form>
       <table border="1">
       	<tr>
@@ -28,12 +28,11 @@
       	<c:forEach items="${listKH}" var="khachhang" varStatus="loop">
       	<tr>
       		<td>${loop.index + 1}</td>
-      		<td>${slot.ten }</td>
-      		<td>${slot.ngaysinh }</td>
-      		<td>${slot.sdt }</td>
-      		<td>${slot.email }</td>
+      		<td>${khachhang.ten }</td>
+      		<td>${khachhang.sdt }</td>
+      		<td>${khachhang.email }</td>
       		<td>
-      			<a href="taolich/${loop.index }">Chọn</a>
+      			<a href="xacnhanlich?idKH=${loop.index }">Chọn</a>
       		</td>
       	</tr>
       	</c:forEach>
