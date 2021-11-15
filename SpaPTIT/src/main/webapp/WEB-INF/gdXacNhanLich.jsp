@@ -20,5 +20,7 @@
       	<h4>Vị trí: ${lichhen.thoigian.slot.ten }</h4>
       	<h4>Dịch vụ: ${lichhen.dichvu.ten}</h4>
       	<h4>Giá tiền: ${lichhen.dichvu.gia}</h4>
+      	<br>
+      	<a href="luu">Đặt lịch</a>
    </body>  
 </html>

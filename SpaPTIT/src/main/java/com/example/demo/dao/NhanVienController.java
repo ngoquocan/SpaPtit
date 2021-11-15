@@ -1,6 +1,5 @@
 package com.example.demo.dao;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -23,11 +21,17 @@ import com.example.demo.model.NhanVien;
 import com.example.demo.model.Slot;
 import com.example.demo.model.SlotKhungGio;
 
-import net.bytebuddy.agent.builder.AgentBuilder.FallbackStrategy.Simple;
-
 @Controller
 @RequestMapping()
 public class NhanVienController {
+	
+	
+	private KhungGioDAO khunggioDAO = new KhungGioDAO();
+	private DichVuDAO dichVuDAO = new DichVuDAO();
+	private SlotDAO slotDAO = new SlotDAO();
+	private KhachHangDAO khDAO = new KhachHangDAO();
+	private LichHenDAO lichhenDAO = new LichHenDAO();
+	private SlotKhungGioDAO skgDAO = new SlotKhungGioDAO();
 	@GetMapping(value = { "/", "login" })
 	public String login() {
 		return "gdDangNhap";
@@ -62,19 +66,11 @@ public class NhanVienController {
 	@GetMapping("/chondichvu")
 	public String chondichvu(HttpSession session) {
 		// lấy danh sách khung giờ
-		ArrayList<KhungGio> listgio = new ArrayList<>();
-		listgio.add(new KhungGio(1, Time.valueOf("07:00:00")));
-		listgio.add(new KhungGio(1, Time.valueOf("08:00:00")));
-		listgio.add(new KhungGio(1, Time.valueOf("09:00:00")));
-		listgio.add(new KhungGio(1, Time.valueOf("10:00:00")));
-
+		ArrayList<KhungGio> listgio = khunggioDAO.getAll();
+		
 		// lấy danh sach dịch vụ
-		ArrayList<DichVu> listDV = new ArrayList<>();
-		DichVu dv = new DichVu();
-		dv.setTen("aaa");
-		listDV.add(dv);
-		listDV.add(dv);
-		listDV.add(dv);
+		ArrayList<DichVu> listDV = dichVuDAO.getAll();
+
 
 		session.setAttribute("listGio", listgio);
 		session.setAttribute("listDV", listDV);
@@ -105,15 +101,7 @@ public class NhanVienController {
 		lichhen.setThoigian(slotKhungGio);
 		session.setAttribute("lichhen", lichhen);
 
-		ArrayList<Slot> listSlot = new ArrayList<>();
-		Slot slot = new Slot();
-		slot.setId(1);
-		slot.setTen("Slot1");
-		listSlot.add(slot);
-		listSlot.add(slot);
-		listSlot.add(slot);
-		listSlot.add(slot);
-		listSlot.add(slot);
+		ArrayList<Slot> listSlot = slotDAO.findSlotTrong(ngaySql,gio.getId());
 
 		session.setAttribute("listSlot", listSlot);
 		return "gdChonSlot";
@@ -125,6 +113,8 @@ public class NhanVienController {
 
 		// gọi từ gd tìm slot
 		if (idSlot != null) {
+			//xóa tt tìm kiếm từ trước
+			session.removeAttribute("listKH");
 			// lấy slot vừa chọn
 			Slot slot = ((ArrayList<Slot>) session.getAttribute("listSlot")).get(idSlot);
 
@@ -138,13 +128,7 @@ public class NhanVienController {
 
 		// gọi từ gd tìm khách hàng
 		if (data != null) {
-			ArrayList<KhachHang> listKH = new ArrayList<>();
-			KhachHang kh = new KhachHang();
-			kh.setTen("aaaaa");
-			listKH.add(kh);
-			listKH.add(kh);
-			listKH.add(kh);
-			listKH.add(kh);
+			ArrayList<KhachHang> listKH = khDAO.findByData(data);
 
 			session.setAttribute("listKH", listKH);
 		}
@@ -161,5 +145,19 @@ public class NhanVienController {
 		lichhen.setKhachhang(kh);
 		session.setAttribute("lichhen", lichhen);
 		return "gdXacNhanLich";
+	}
+	
+	@GetMapping("/luu")
+	public String luu(HttpSession session) {
+		LichHen lichhen = (LichHen) session.getAttribute("lichhen");
+		SlotKhungGio skg = lichhen.getThoigian();
+		
+		Integer id = skgDAO.luuSlotKhungGio(skg);
+		skg.setId(id);
+		lichhen.setThoigian(skg);
+		
+		lichhenDAO.luuLichHen(lichhen);
+		
+		return "gdChinh";
 	}
 }
